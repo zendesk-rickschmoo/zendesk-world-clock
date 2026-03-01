@@ -49,17 +49,24 @@ struct City: Identifiable {
     }
 
     func flightsURL(from originCity: String?) -> URL? {
-        let destination = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? name
-        let dateString = City.nextBusinessDayString()
+        let nextBizDay = City.nextBusinessDay()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM d"
+        let dateString = formatter.string(from: nextBizDay)
 
-        var query = "flights to \(destination) on \(dateString) at 9am"
-        if let origin = originCity, !origin.isEmpty {
-            let encodedOrigin = origin.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? origin
-            query = "flights from \(encodedOrigin) to \(destination) on \(dateString) at 9am"
+        // Build a Google search query that triggers the flights widget
+        var query = "flights to \(name) \(dateString)"
+        if let originCity = originCity, !originCity.isEmpty {
+            // Extract just the city name (before any comma)
+            let cityName = originCity.components(separatedBy: ",").first ?? originCity
+            query = "flights from \(cityName) to \(name) \(dateString)"
         }
 
-        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
-        return URL(string: "https://www.google.com/travel/flights?q=\(encodedQuery)")
+        guard let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+            return nil
+        }
+
+        return URL(string: "https://www.google.com/search?q=\(encodedQuery)")
     }
 
     static func nextBusinessDay() -> Date {
