@@ -1,12 +1,18 @@
 import XCTest
+import CoreLocation
 @testable import ZendeskWorldClock
 
 final class TimeFormatTests: XCTestCase {
 
+    // Helper to create a test city with dummy coordinates
+    private func makeTestCity(name: String = "Test City", timeZone: TimeZone) -> City {
+        City(name: name, timeZone: timeZone, coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0))
+    }
+
     // MARK: - City.formattedTime Tests
 
     func testFormattedTime_12HourFormat_ShowsAMPM() {
-        let city = City(name: "Test City", timeZone: TimeZone(identifier: "UTC")!)
+        let city = makeTestCity(timeZone: TimeZone(identifier: "UTC")!)
         let result = city.formattedTime(use12Hour: true)
 
         // 12-hour format should contain AM or PM
@@ -17,7 +23,7 @@ final class TimeFormatTests: XCTestCase {
     }
 
     func testFormattedTime_24HourFormat_NoAMPM() {
-        let city = City(name: "Test City", timeZone: TimeZone(identifier: "UTC")!)
+        let city = makeTestCity(timeZone: TimeZone(identifier: "UTC")!)
         let result = city.formattedTime(use12Hour: false)
 
         // 24-hour format should NOT contain AM or PM
@@ -28,7 +34,7 @@ final class TimeFormatTests: XCTestCase {
     }
 
     func testFormattedTime_12HourFormat_MatchesExpectedPattern() {
-        let city = City(name: "Test City", timeZone: TimeZone(identifier: "UTC")!)
+        let city = makeTestCity(timeZone: TimeZone(identifier: "UTC")!)
         let result = city.formattedTime(use12Hour: true)
 
         // Pattern: h:mm AM/PM (e.g., "2:30 PM" or "12:05 AM")
@@ -43,7 +49,7 @@ final class TimeFormatTests: XCTestCase {
     }
 
     func testFormattedTime_24HourFormat_MatchesExpectedPattern() {
-        let city = City(name: "Test City", timeZone: TimeZone(identifier: "UTC")!)
+        let city = makeTestCity(timeZone: TimeZone(identifier: "UTC")!)
         let result = city.formattedTime(use12Hour: false)
 
         // Pattern: HH:mm (e.g., "14:30" or "02:05")
@@ -60,7 +66,7 @@ final class TimeFormatTests: XCTestCase {
     // MARK: - Format Consistency Tests with Known Times
 
     func testFormattedTime_AtSpecificTime_12HourFormat() {
-        let city = City(name: "Test City", timeZone: TimeZone(identifier: "UTC")!)
+        let city = makeTestCity(timeZone: TimeZone(identifier: "UTC")!)
 
         // Create a specific date: 14:30 UTC
         var components = DateComponents()
@@ -78,7 +84,7 @@ final class TimeFormatTests: XCTestCase {
     }
 
     func testFormattedTime_AtSpecificTime_24HourFormat() {
-        let city = City(name: "Test City", timeZone: TimeZone(identifier: "UTC")!)
+        let city = makeTestCity(timeZone: TimeZone(identifier: "UTC")!)
 
         // Create a specific date: 14:30 UTC
         var components = DateComponents()
@@ -96,7 +102,7 @@ final class TimeFormatTests: XCTestCase {
     }
 
     func testFormattedTime_MidnightHour_12HourFormat() {
-        let city = City(name: "Test City", timeZone: TimeZone(identifier: "UTC")!)
+        let city = makeTestCity(timeZone: TimeZone(identifier: "UTC")!)
 
         // Create a specific date: 00:15 UTC
         var components = DateComponents()
@@ -114,7 +120,7 @@ final class TimeFormatTests: XCTestCase {
     }
 
     func testFormattedTime_MidnightHour_24HourFormat() {
-        let city = City(name: "Test City", timeZone: TimeZone(identifier: "UTC")!)
+        let city = makeTestCity(timeZone: TimeZone(identifier: "UTC")!)
 
         // Create a specific date: 00:15 UTC
         var components = DateComponents()
@@ -132,7 +138,7 @@ final class TimeFormatTests: XCTestCase {
     }
 
     func testFormattedTime_NoonHour_12HourFormat() {
-        let city = City(name: "Test City", timeZone: TimeZone(identifier: "UTC")!)
+        let city = makeTestCity(timeZone: TimeZone(identifier: "UTC")!)
 
         // Create a specific date: 12:00 UTC
         var components = DateComponents()
@@ -153,7 +159,7 @@ final class TimeFormatTests: XCTestCase {
 
     func testFormattedTime_DifferentTimezone_12HourFormat() {
         // Tokyo is UTC+9
-        let tokyoCity = City(name: "Tokyo", timeZone: TimeZone(identifier: "Asia/Tokyo")!)
+        let tokyoCity = makeTestCity(name: "Tokyo", timeZone: TimeZone(identifier: "Asia/Tokyo")!)
 
         // Create a specific date: 14:30 UTC = 23:30 Tokyo
         var components = DateComponents()
@@ -172,7 +178,7 @@ final class TimeFormatTests: XCTestCase {
 
     func testFormattedTime_DifferentTimezone_24HourFormat() {
         // Tokyo is UTC+9
-        let tokyoCity = City(name: "Tokyo", timeZone: TimeZone(identifier: "Asia/Tokyo")!)
+        let tokyoCity = makeTestCity(name: "Tokyo", timeZone: TimeZone(identifier: "Asia/Tokyo")!)
 
         // Create a specific date: 14:30 UTC = 23:30 Tokyo
         var components = DateComponents()

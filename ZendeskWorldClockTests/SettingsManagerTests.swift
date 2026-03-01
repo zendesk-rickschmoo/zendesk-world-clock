@@ -1,4 +1,5 @@
 import XCTest
+import CoreLocation
 @testable import ZendeskWorldClock
 
 final class SettingsManagerTests: XCTestCase {
@@ -16,6 +17,11 @@ final class SettingsManagerTests: XCTestCase {
     override func tearDown() {
         testDefaults.removePersistentDomain(forName: testSuiteName)
         super.tearDown()
+    }
+
+    // Helper to create a test city with dummy coordinates
+    private func makeTestCity(name: String = "Test City", timeZone: TimeZone) -> City {
+        City(name: name, timeZone: timeZone, coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0))
     }
 
     // MARK: - 12/24 Hour Format Setting Tests
@@ -56,7 +62,7 @@ final class SettingsManagerTests: XCTestCase {
     // MARK: - Integration Test: Format Changes with Setting
 
     func testTimeFormat_ChangesWithSetting() {
-        let city = City(name: "Test City", timeZone: TimeZone(identifier: "UTC")!)
+        let city = makeTestCity(timeZone: TimeZone(identifier: "UTC")!)
 
         // Create a specific date for deterministic testing
         var components = DateComponents()

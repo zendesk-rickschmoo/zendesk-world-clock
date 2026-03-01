@@ -5,6 +5,7 @@ struct ContentView: View {
     @State private var showingSettings = false
     @AppStorage("use12HourFormat") private var use12HourFormat = false
     @State private var hiddenCities: Set<String>
+    @ObservedObject private var locationManager = LocationManager.shared
 
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -35,7 +36,7 @@ struct ContentView: View {
                 }
                 .padding(.vertical, 8)
             }
-            .frame(width: 300, height: 400)
+            .frame(width: 380, height: 400)
         }
         .onReceive(timer) { _ in
             currentTime = Date()
@@ -78,16 +79,24 @@ struct ContentView: View {
 
             Text(city.name)
                 .font(.system(size: 13))
+                .frame(width: 100, alignment: .leading)
 
             Text("(\(city.timeZoneAbbreviation))")
                 .font(.system(size: 11))
                 .foregroundColor(.secondary)
+                .frame(width: 45, alignment: .leading)
 
             Spacer()
 
             Text(formatTime(for: city))
                 .font(.system(size: 13, design: .monospaced))
                 .foregroundColor(.primary)
+                .frame(width: 70, alignment: .trailing)
+
+            Text(city.formattedDistance(from: locationManager.currentLocation))
+                .font(.system(size: 11))
+                .foregroundColor(.secondary)
+                .frame(width: 55, alignment: .trailing)
 
             Button(action: {
                 hideCity(city.name)

@@ -26,5 +26,9 @@
 	<string></string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Zendesk World Clock uses your location to calculate distances to office locations.</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Zendesk World Clock uses your location to calculate distances to office locations.</string>
 </dict>
 </plist>

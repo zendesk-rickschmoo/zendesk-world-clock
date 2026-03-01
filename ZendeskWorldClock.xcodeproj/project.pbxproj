@@ -14,6 +14,7 @@
 		A1000009000000000001 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000010000000000001 /* SettingsView.swift */; };
 		A1000011000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000012000000000001 /* Assets.xcassets */; };
 		A1000029000000000001 /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000030000000000001 /* SettingsManager.swift */; };
+		A1000031000000000001 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000032000000000001 /* LocationManager.swift */; };
 		A2000001000000000001 /* TimeFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002000000000001 /* TimeFormatTests.swift */; };
 		A2000003000000000001 /* SettingsManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000004000000000001 /* SettingsManagerTests.swift */; };
 /* End PBXBuildFile section */
@@ -38,6 +39,7 @@
 		A1000012000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000014000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A1000030000000000001 /* SettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
+		A1000032000000000001 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		A2000006000000000001 /* ZendeskWorldClockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZendeskWorldClockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2000002000000000001 /* TimeFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeFormatTests.swift; sourceTree = "<group>"; };
 		A2000004000000000001 /* SettingsManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsManagerTests.swift; sourceTree = "<group>"; };
@@ -79,6 +81,7 @@
 				A1000008000000000001 /* City.swift */,
 				A1000010000000000001 /* SettingsView.swift */,
 				A1000030000000000001 /* SettingsManager.swift */,
+				A1000032000000000001 /* LocationManager.swift */,
 				A1000012000000000001 /* Assets.xcassets */,
 				A1000014000000000001 /* Info.plist */,
 			);
@@ -209,6 +212,7 @@
 				A1000007000000000001 /* City.swift in Sources */,
 				A1000009000000000001 /* SettingsView.swift in Sources */,
 				A1000029000000000001 /* SettingsManager.swift in Sources */,
+				A1000031000000000001 /* LocationManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
