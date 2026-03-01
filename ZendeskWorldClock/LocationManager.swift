@@ -18,8 +18,10 @@ class LocationManager: NSObject, ObservableObject {
     static let shared = LocationManager()
 
     private let locationManager = CLLocationManager()
+    private let geocoder = CLGeocoder()
 
     @Published var currentLocation: CLLocation?
+    @Published var currentPlaceName: String?
     @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
     @Published var locationError: String?
 
@@ -102,11 +104,14 @@ class LocationManager: NSObject, ObservableObject {
                 locationError = "Invalid coordinates"
             }
             currentLocation = nil
+            currentPlaceName = nil
             return
         }
 
         locationError = nil
-        currentLocation = CLLocation(latitude: lat, longitude: lon)
+        let location = CLLocation(latitude: lat, longitude: lon)
+        currentLocation = location
+        reverseGeocode(location)
     }
 
     func geocodeCity(_ cityName: String, completion: @escaping (Bool) -> Void) {
@@ -115,13 +120,13 @@ class LocationManager: NSObject, ObservableObject {
             return
         }
 
-        let geocoder = CLGeocoder()
         geocoder.geocodeAddressString(cityName) { [weak self] placemarks, error in
             DispatchQueue.main.async {
-                if let location = placemarks?.first?.location {
+                if let placemark = placemarks?.first, let location = placemark.location {
                     self?.manualLatitude = String(format: "%.4f", location.coordinate.latitude)
                     self?.manualLongitude = String(format: "%.4f", location.coordinate.longitude)
                     self?.manualCityName = cityName
+                    self?.currentPlaceName = self?.formatPlaceName(from: placemark)
                     self?.locationError = nil
                     completion(true)
                 } else {
@@ -131,6 +136,40 @@ class LocationManager: NSObject, ObservableObject {
             }
         }
     }
+
+    private func reverseGeocode(_ location: CLLocation) {
+        geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, error in
+            DispatchQueue.main.async {
+                if let placemark = placemarks?.first {
+                    self?.currentPlaceName = self?.formatPlaceName(from: placemark)
+                } else {
+                    self?.currentPlaceName = nil
+                }
+            }
+        }
+    }
+
+    private func formatPlaceName(from placemark: CLPlacemark) -> String {
+        // Try to get the most specific location name available
+        if let locality = placemark.locality {
+            if let adminArea = placemark.administrativeArea, let country = placemark.country {
+                // For US cities, show state; for others, show country
+                if placemark.isoCountryCode == "US" {
+                    return "\(locality), \(adminArea)"
+                } else {
+                    return "\(locality), \(country)"
+                }
+            }
+            return locality
+        } else if let subLocality = placemark.subLocality {
+            return subLocality
+        } else if let adminArea = placemark.administrativeArea {
+            return adminArea
+        } else if let country = placemark.country {
+            return country
+        }
+        return "Unknown location"
+    }
 }
 
 extension LocationManager: CLLocationManagerDelegate {
@@ -139,6 +178,7 @@ extension LocationManager: CLLocationManagerDelegate {
         if let location = locations.last {
             currentLocation = location
             locationError = nil
+            reverseGeocode(location)
         }
     }
 

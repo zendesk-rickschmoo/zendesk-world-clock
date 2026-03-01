@@ -38,7 +38,7 @@ struct SettingsView: View {
             }
         }
         .padding()
-        .frame(width: 320, height: 420)
+        .frame(width: 320, height: 450)
         .onAppear {
             manualLat = locationManager.manualLatitude
             manualLon = locationManager.manualLongitude
@@ -80,18 +80,33 @@ struct SettingsView: View {
     private var automaticLocationView: some View {
         Group {
             if let location = locationManager.currentLocation {
-                HStack {
-                    Image(systemName: "location.fill")
-                        .foregroundColor(.green)
-                        .font(.system(size: 12))
-                    Text(String(format: "%.2f, %.2f", location.coordinate.latitude, location.coordinate.longitude))
-                        .font(.system(size: 12))
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Button("Refresh") {
-                        locationManager.requestLocation()
+                VStack(alignment: .leading, spacing: 4) {
+                    // Place name
+                    if let placeName = locationManager.currentPlaceName {
+                        HStack {
+                            Image(systemName: "mappin.circle.fill")
+                                .foregroundColor(.blue)
+                                .font(.system(size: 12))
+                            Text(placeName)
+                                .font(.system(size: 12, weight: .medium))
+                            Spacer()
+                        }
                     }
-                    .font(.system(size: 11))
+
+                    // Coordinates
+                    HStack {
+                        Image(systemName: "location.fill")
+                            .foregroundColor(.green)
+                            .font(.system(size: 12))
+                        Text(String(format: "%.4f, %.4f", location.coordinate.latitude, location.coordinate.longitude))
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Button("Refresh") {
+                            locationManager.requestLocation()
+                        }
+                        .font(.system(size: 11))
+                    }
                 }
             } else if locationManager.authorizationStatus == .notDetermined {
                 Button("Enable Location Services") {
@@ -166,14 +181,31 @@ struct SettingsView: View {
             }
 
             if locationManager.currentLocation != nil && locationManager.locationMode == .manual {
-                HStack {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.green)
-                        .font(.system(size: 12))
-                    Text("Location set")
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                    Spacer()
+                VStack(alignment: .leading, spacing: 4) {
+                    // Place name from reverse geocoding
+                    if let placeName = locationManager.currentPlaceName {
+                        HStack {
+                            Image(systemName: "mappin.circle.fill")
+                                .foregroundColor(.blue)
+                                .font(.system(size: 12))
+                            Text(placeName)
+                                .font(.system(size: 12, weight: .medium))
+                            Spacer()
+                        }
+                    }
+
+                    // Confirmation with coordinates
+                    HStack {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                            .font(.system(size: 12))
+                        Text(String(format: "%.4f, %.4f",
+                             locationManager.currentLocation!.coordinate.latitude,
+                             locationManager.currentLocation!.coordinate.longitude))
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                        Spacer()
+                    }
                 }
             }
         }
