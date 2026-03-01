@@ -43,6 +43,11 @@ struct City: Identifiable {
         }
     }
 
+    var googleMapsURL: URL? {
+        let urlString = "https://www.google.com/maps/search/?api=1&query=\(coordinate.latitude),\(coordinate.longitude)"
+        return URL(string: urlString)
+    }
+
     var timeZoneAbbreviation: String {
         timeZone.abbreviation(for: currentTime) ?? ""
     }

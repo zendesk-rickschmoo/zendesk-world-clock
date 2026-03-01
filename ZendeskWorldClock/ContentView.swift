@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 enum SortColumn: String, CaseIterable {
     case city = "city"
@@ -179,9 +180,16 @@ struct ContentView: View {
                 .fill(Color(city.workHoursStatus.color))
                 .frame(width: 8, height: 8)
 
-            Text(city.name)
-                .font(.system(size: 13))
-                .frame(width: 100, alignment: .leading)
+            Button(action: {
+                openInMaps(city)
+            }) {
+                Text(city.name)
+                    .font(.system(size: 13))
+                    .foregroundColor(.accentColor)
+            }
+            .buttonStyle(.plain)
+            .help("Open \(city.name) in Google Maps")
+            .frame(width: 100, alignment: .leading)
 
             Text("(\(city.timeZoneAbbreviation))")
                 .font(.system(size: 11))
@@ -212,6 +220,12 @@ struct ContentView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 4)
+    }
+
+    private func openInMaps(_ city: City) {
+        if let url = city.googleMapsURL {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     private func formatTime(for city: City) -> String {
