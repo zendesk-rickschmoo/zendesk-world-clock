@@ -48,6 +48,46 @@ struct City: Identifiable {
         return URL(string: urlString)
     }
 
+    func flightsURL(from originCity: String?) -> URL? {
+        let destination = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? name
+        let dateString = City.nextBusinessDayString()
+
+        var query = "flights to \(destination) on \(dateString) at 9am"
+        if let origin = originCity, !origin.isEmpty {
+            let encodedOrigin = origin.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? origin
+            query = "flights from \(encodedOrigin) to \(destination) on \(dateString) at 9am"
+        }
+
+        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
+        return URL(string: "https://www.google.com/travel/flights?q=\(encodedQuery)")
+    }
+
+    static func nextBusinessDay() -> Date {
+        let calendar = Calendar.current
+        var date = Date()
+
+        // Move to tomorrow first
+        date = calendar.date(byAdding: .day, value: 1, to: date) ?? date
+
+        // Skip weekends
+        while true {
+            let weekday = calendar.component(.weekday, from: date)
+            // 1 = Sunday, 7 = Saturday
+            if weekday != 1 && weekday != 7 {
+                break
+            }
+            date = calendar.date(byAdding: .day, value: 1, to: date) ?? date
+        }
+
+        return date
+    }
+
+    static func nextBusinessDayString() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: nextBusinessDay())
+    }
+
     var timeZoneAbbreviation: String {
         timeZone.abbreviation(for: currentTime) ?? ""
     }

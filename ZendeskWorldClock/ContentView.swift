@@ -203,10 +203,17 @@ struct ContentView: View {
                 .foregroundColor(.primary)
                 .frame(width: 70, alignment: .trailing)
 
-            Text(city.formattedDistance(from: locationManager.currentLocation))
-                .font(.system(size: 11))
-                .foregroundColor(.secondary)
-                .frame(width: 55, alignment: .trailing)
+            Button(action: {
+                openFlights(to: city)
+            }) {
+                Text(city.formattedDistance(from: locationManager.currentLocation))
+                    .font(.system(size: 11))
+                    .foregroundColor(locationManager.currentLocation != nil ? .accentColor : .secondary)
+            }
+            .buttonStyle(.plain)
+            .disabled(locationManager.currentLocation == nil)
+            .help(locationManager.currentLocation != nil ? "Search flights to \(city.name)" : "Set your location to search flights")
+            .frame(width: 55, alignment: .trailing)
 
             Button(action: {
                 hideCity(city.name)
@@ -224,6 +231,13 @@ struct ContentView: View {
 
     private func openInMaps(_ city: City) {
         if let url = city.googleMapsURL {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    private func openFlights(to city: City) {
+        let originCity = locationManager.currentPlaceName
+        if let url = city.flightsURL(from: originCity) {
             NSWorkspace.shared.open(url)
         }
     }
