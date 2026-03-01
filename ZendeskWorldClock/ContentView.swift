@@ -236,8 +236,7 @@ struct ContentView: View {
     }
 
     private func openFlights(to city: City) {
-        let originCity = locationManager.currentPlaceName
-        if let url = city.flightsURL(from: originCity) {
+        if let url = city.flightsURL(from: locationManager.currentLocation) {
             NSWorkspace.shared.open(url)
         }
     }

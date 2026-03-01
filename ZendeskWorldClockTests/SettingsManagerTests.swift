@@ -21,7 +21,7 @@ final class SettingsManagerTests: XCTestCase {
 
     // Helper to create a test city with dummy coordinates
     private func makeTestCity(name: String = "Test City", timeZone: TimeZone) -> City {
-        City(name: name, timeZone: timeZone, coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0))
+        City(name: name, timeZone: timeZone, coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0), airportCode: "TST")
     }
 
     // MARK: - 12/24 Hour Format Setting Tests
