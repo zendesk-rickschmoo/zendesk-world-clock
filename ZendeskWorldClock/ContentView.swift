@@ -1,9 +1,18 @@
 import SwiftUI
 
+enum SortColumn: String, CaseIterable {
+    case city = "city"
+    case timezone = "timezone"
+    case time = "time"
+    case distance = "distance"
+}
+
 struct ContentView: View {
     @State private var currentTime = Date()
     @State private var showingSettings = false
     @AppStorage("use12HourFormat") private var use12HourFormat = false
+    @AppStorage("sortColumn") private var sortColumn: String = SortColumn.timezone.rawValue
+    @AppStorage("sortAscending") private var sortAscending = true
     @State private var hiddenCities: Set<String>
     @ObservedObject private var locationManager = LocationManager.shared
 
@@ -18,8 +27,41 @@ struct ContentView: View {
         }
     }
 
-    private var visibleCities: [City] {
-        City.zendeskCities.filter { !hiddenCities.contains($0.name) }
+    private var currentSortColumn: SortColumn {
+        SortColumn(rawValue: sortColumn) ?? .timezone
+    }
+
+    private var sortedCities: [City] {
+        let filtered = City.zendeskCities.filter { !hiddenCities.contains($0.name) }
+
+        let sorted: [City]
+        switch currentSortColumn {
+        case .city:
+            sorted = filtered.sorted { $0.name.localizedCompare($1.name) == .orderedAscending }
+        case .timezone:
+            sorted = filtered.sorted {
+                $0.timeZone.secondsFromGMT(for: currentTime) < $1.timeZone.secondsFromGMT(for: currentTime)
+            }
+        case .time:
+            sorted = filtered.sorted {
+                let cal = Calendar.current
+                let comp1 = cal.dateComponents(in: $0.timeZone, from: currentTime)
+                let comp2 = cal.dateComponents(in: $1.timeZone, from: currentTime)
+                let mins1 = (comp1.hour ?? 0) * 60 + (comp1.minute ?? 0)
+                let mins2 = (comp2.hour ?? 0) * 60 + (comp2.minute ?? 0)
+                return mins1 < mins2
+            }
+        case .distance:
+            if let userLocation = locationManager.currentLocation {
+                sorted = filtered.sorted {
+                    $0.distance(from: userLocation) < $1.distance(from: userLocation)
+                }
+            } else {
+                sorted = filtered
+            }
+        }
+
+        return sortAscending ? sorted : sorted.reversed()
     }
 
     var body: some View {
@@ -28,15 +70,18 @@ struct ContentView: View {
 
             Divider()
 
+            columnHeadersView
+
+            Divider()
+
             ScrollView {
-                VStack(spacing: 8) {
-                    ForEach(visibleCities) { city in
+                VStack(spacing: 0) {
+                    ForEach(sortedCities) { city in
                         cityRow(for: city)
                     }
                 }
-                .padding(.vertical, 8)
             }
-            .frame(width: 380, height: 400)
+            .frame(width: 380, height: 370)
         }
         .onReceive(timer) { _ in
             currentTime = Date()
@@ -69,6 +114,63 @@ struct ContentView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .background(Color(NSColor.controlBackgroundColor))
+    }
+
+    private var columnHeadersView: some View {
+        HStack(spacing: 8) {
+            // Spacer for status indicator
+            Color.clear.frame(width: 8, height: 8)
+
+            sortableHeader("City", column: .city, width: 100, alignment: .leading)
+
+            sortableHeader("TZ", column: .timezone, width: 45, alignment: .leading)
+
+            Spacer()
+
+            sortableHeader("Time", column: .time, width: 70, alignment: .trailing)
+
+            sortableHeader("Dist", column: .distance, width: 55, alignment: .trailing)
+
+            // Spacer for hide button
+            Color.clear.frame(width: 20)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
+    }
+
+    private func sortableHeader(_ title: String, column: SortColumn, width: CGFloat, alignment: Alignment) -> some View {
+        Button(action: {
+            if currentSortColumn == column {
+                sortAscending.toggle()
+            } else {
+                sortColumn = column.rawValue
+                sortAscending = true
+            }
+        }) {
+            HStack(spacing: 2) {
+                if alignment == .trailing {
+                    Spacer(minLength: 0)
+                }
+
+                Text(title)
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(.secondary)
+
+                if currentSortColumn == column {
+                    Image(systemName: sortAscending ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 8, weight: .bold))
+                        .foregroundColor(.accentColor)
+                }
+
+                if alignment == .leading {
+                    Spacer(minLength: 0)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .frame(width: width, alignment: alignment)
+        .help("Sort by \(title.lowercased())")
     }
 
     private func cityRow(for city: City) -> some View {
