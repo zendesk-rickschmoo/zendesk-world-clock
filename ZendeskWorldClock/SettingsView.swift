@@ -31,8 +31,6 @@ struct SettingsView: View {
 
             hiddenCitiesSection
 
-            Spacer()
-
             Button("Done") {
                 dismiss()
             }
@@ -221,8 +219,7 @@ struct SettingsView: View {
                 Text("No hidden cities")
                     .font(.system(size: 12))
                     .foregroundColor(.gray)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             } else {
                 ScrollView {
                     VStack(spacing: 4) {
@@ -249,10 +246,9 @@ struct SettingsView: View {
                         }
                     }
                 }
-                .frame(maxHeight: 80)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     private func lookupCity() {

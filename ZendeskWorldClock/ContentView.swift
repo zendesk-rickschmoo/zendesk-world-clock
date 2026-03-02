@@ -126,6 +126,11 @@ struct ContentView: View {
 
             sortableHeader("TZ", column: .timezone, width: 45, alignment: .leading)
 
+            Text("Airport")
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(.secondary)
+                .frame(width: 40, alignment: .leading)
+
             Spacer()
 
             sortableHeader("Time", column: .time, width: 70, alignment: .trailing)
@@ -196,6 +201,17 @@ struct ContentView: View {
                 .foregroundColor(.secondary)
                 .frame(width: 45, alignment: .leading)
 
+            Button(action: {
+                openAirportInMaps(city.airportCode)
+            }) {
+                Text(city.airportCode)
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundColor(.accentColor)
+            }
+            .buttonStyle(.plain)
+            .help("Open \(city.airportCode) airport in Google Maps")
+            .frame(width: 40, alignment: .leading)
+
             Spacer()
 
             Text(formatTime(for: city))
@@ -232,6 +248,23 @@ struct ContentView: View {
     private func openInMaps(_ city: City) {
         if let url = city.googleMapsURL {
             NSWorkspace.shared.open(url)
+        }
+    }
+
+    private func openAirportInMaps(_ airportCode: String) {
+        // Find the airport coordinates from our database
+        if let airport = Airport.majorAirports.first(where: { $0.code == airportCode }) {
+            // Use coordinates with satellite view (t=k) and zoom level 14
+            let urlString = "https://www.google.com/maps?q=\(airport.coordinate.latitude),\(airport.coordinate.longitude)&t=k&z=14"
+            if let url = URL(string: urlString) {
+                NSWorkspace.shared.open(url)
+            }
+        } else {
+            // Fallback to search if airport not in database
+            let urlString = "https://www.google.com/maps/search/\(airportCode)+airport"
+            if let url = URL(string: urlString) {
+                NSWorkspace.shared.open(url)
+            }
         }
     }
 

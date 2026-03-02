@@ -33,6 +33,8 @@ struct Airport {
         Airport(code: "YVR", name: "Vancouver", coordinate: CLLocationCoordinate2D(latitude: 49.1947, longitude: -123.1792)),
         Airport(code: "MEX", name: "Mexico City", coordinate: CLLocationCoordinate2D(latitude: 19.4363, longitude: -99.0721)),
         Airport(code: "HNL", name: "Honolulu", coordinate: CLLocationCoordinate2D(latitude: 21.3245, longitude: -157.9251)),
+        Airport(code: "AUS", name: "Austin", coordinate: CLLocationCoordinate2D(latitude: 30.1975, longitude: -97.6664)),
+        Airport(code: "MSN", name: "Madison", coordinate: CLLocationCoordinate2D(latitude: 43.1399, longitude: -89.3375)),
 
         // Europe
         Airport(code: "LHR", name: "London Heathrow", coordinate: CLLocationCoordinate2D(latitude: 51.4700, longitude: -0.4543)),
@@ -78,6 +80,7 @@ struct Airport {
         Airport(code: "DEL", name: "Delhi", coordinate: CLLocationCoordinate2D(latitude: 28.5562, longitude: 77.1000)),
         Airport(code: "BOM", name: "Mumbai", coordinate: CLLocationCoordinate2D(latitude: 19.0896, longitude: 72.8656)),
         Airport(code: "BLR", name: "Bengaluru", coordinate: CLLocationCoordinate2D(latitude: 13.1986, longitude: 77.7066)),
+        Airport(code: "PNQ", name: "Pune", coordinate: CLLocationCoordinate2D(latitude: 18.5822, longitude: 73.9197)),
         Airport(code: "MNL", name: "Manila", coordinate: CLLocationCoordinate2D(latitude: 14.5086, longitude: 121.0194)),
         Airport(code: "CGK", name: "Jakarta", coordinate: CLLocationCoordinate2D(latitude: -6.1256, longitude: 106.6559)),
 
@@ -235,58 +238,58 @@ struct City: Identifiable {
 extension City {
     static let zendeskCities: [City] = {
         // City data: (name, timezone, latitude, longitude, airportCode)
-        // Coordinates are for actual Zendesk office locations where known
+        // Coordinates are for actual Zendesk office locations per zendesk.co.uk/contact/
         let cityData: [(String, String, Double, Double, String)] = [
             // 1132 Bishop St, Honolulu, HI 96813
             ("Honolulu", "Pacific/Honolulu", 21.3073, -157.8631, "HNL"),
             // 181 Fremont St, San Francisco, CA 94105 (HQ)
             ("San Francisco", "America/Los_Angeles", 37.7901, -122.3972, "SFO"),
-            // 600 Congress Ave, Austin, TX 78701
-            ("Austin", "America/Chicago", 30.2686, -97.7436, "AUS"),
-            // 1 S Pinckney St, Madison, WI 53703
-            ("Madison", "America/Chicago", 43.0747, -89.3841, "MSN"),
-            // Av. Paseo de la Reforma 250, Mexico City
-            ("Mexico City", "America/Mexico_City", 19.4270, -99.1677, "MEX"),
-            // 1751 Rue Richardson, Montréal, QC H3K 1G6
-            ("Montréal", "America/Toronto", 45.4882, -73.5534, "YUL"),
-            // Rua Funchal 418, São Paulo
-            ("São Paulo", "America/Sao_Paulo", -23.5868, -46.6850, "GRU"),
-            // 55 Charlemont Place, Dublin 2, D02 F985
+            // 405 Comal St., Floor 6, Austin, TX
+            ("Austin", "America/Chicago", 30.2651, -97.7355, "AUS"),
+            // 25 W Main St, Madison, WI
+            ("Madison", "America/Chicago", 43.0741, -89.3842, "MSN"),
+            // Lago Alberto 375, Mexico City
+            ("Mexico City", "America/Mexico_City", 19.4395, -99.2030, "MEX"),
+            // 385 Av. Viger O, Montréal
+            ("Montréal", "America/Toronto", 45.5093, -73.5622, "YUL"),
+            // Av. Dr Chucri Zaidan, 920 – 14th floor, São Paulo
+            ("São Paulo", "America/Sao_Paulo", -23.6229, -46.6990, "GRU"),
+            // 55 Charlemont Pl, Dublin 2, D02 F985
             ("Dublin", "Europe/Dublin", 53.3318, -6.2591, "DUB"),
-            // 45 Mortimer Street, London W1W 8HJ
-            ("London", "Europe/London", 51.5180, -0.1407, "LHR"),
-            // Praça Duque de Saldanha 1, Lisbon
-            ("Lisbon", "Europe/Lisbon", 38.7350, -9.1452, "LIS"),
-            // 40 Rue du Louvre, 75001 Paris
-            ("Paris", "Europe/Paris", 48.8626, 2.3410, "CDG"),
-            // Wibautstraat 131, 1091 GL Amsterdam
-            ("Amsterdam", "Europe/Amsterdam", 52.3518, 4.9073, "AMS"),
-            // Rheinsberger Str. 73, 10115 Berlin
-            ("Berlin", "Europe/Berlin", 52.5359, 13.3989, "BER"),
-            // Snaregade 12, 1205 København K
-            ("Copenhagen", "Europe/Copenhagen", 55.6773, 12.5742, "CPH"),
-            // Via Orefici 2, 20123 Milano
-            ("Milan", "Europe/Rome", 45.4639, 9.1877, "MXP"),
-            // Rynek Główny 6, 31-042 Kraków
-            ("Kraków", "Europe/Warsaw", 50.0619, 19.9372, "KRK"),
-            // Tornimäe 2, 10145 Tallinn
-            ("Tallinn", "Europe/Tallinn", 59.4340, 24.7536, "TLL"),
-            // Bulevar oslobođenja 127, Novi Sad
-            ("Novi Sad", "Europe/Belgrade", 45.2461, 19.8494, "BEG"),
-            // Embassy Golf Links, Bengaluru, Karnataka 560071
-            ("Bengaluru", "Asia/Kolkata", 12.9611, 77.6472, "BLR"),
-            // Panchshil Tech Park, Shivajinagar, Pune
-            ("Pune", "Asia/Kolkata", 18.5380, 73.8353, "PNQ"),
-            // 1 Raffles Place, Singapore 048616
-            ("Singapore", "Asia/Singapore", 1.2840, 103.8510, "SIN"),
-            // 507 Gangnam-daero, Seocho-gu, Seoul
-            ("Seoul", "Asia/Seoul", 37.4979, 127.0276, "ICN"),
-            // Shibuya Scramble Square, 2-24-12 Shibuya, Tokyo
-            ("Tokyo", "Asia/Tokyo", 35.6580, 139.7016, "NRT"),
-            // BGC Corporate Center, 30th Street, Taguig
+            // 30 Eastbourne Terrace, Paddington, London W2 6LA
+            ("London", "Europe/London", 51.5174, -0.1768, "LHR"),
+            // R. Alexandre Herculano 50, Lisbon
+            ("Lisbon", "Europe/Lisbon", 38.7223, -9.1493, "LIS"),
+            // 32 Rue de Trévise, 75009 Paris
+            ("Paris", "Europe/Paris", 48.8749, 2.3461, "CDG"),
+            // Strawinskylaan 4117, 4th Floor, Amsterdam
+            ("Amsterdam", "Europe/Amsterdam", 52.3390, 4.8733, "AMS"),
+            // Paul-Lincke-Ufer 39/40, Berlin
+            ("Berlin", "Europe/Berlin", 52.4954, 13.4252, "BER"),
+            // Njalsgade 72C, 2, Copenhagen
+            ("Copenhagen", "Europe/Copenhagen", 55.6576, 12.5929, "CPH"),
+            // Via San Marco 21, Milano
+            ("Milan", "Europe/Rome", 45.4757, 9.1887, "MXP"),
+            // Marii Konopnickiej 29, Kraków
+            ("Kraków", "Europe/Warsaw", 50.0527, 19.9316, "KRK"),
+            // Vana-Lõuna tn 39-1, Tallinn
+            ("Tallinn", "Europe/Tallinn", 59.4264, 24.7564, "TLL"),
+            // Bulevar Oslobodjenja 83, Novi Sad
+            ("Novi Sad", "Europe/Belgrade", 45.2553, 19.8307, "BEG"),
+            // 62/53, Church St, Bengaluru
+            ("Bengaluru", "Asia/Kolkata", 12.9751, 77.6071, "BLR"),
+            // Abil Boulevard, North Main Road, Koregaon Park, Pune
+            ("Pune", "Asia/Kolkata", 18.5362, 73.8939, "PNQ"),
+            // 9 Straits View, Marina One West Tower, Singapore
+            ("Singapore", "Asia/Singapore", 1.2770, 103.8543, "SIN"),
+            // 373 Gangnam-daero, Seoul
+            ("Seoul", "Asia/Seoul", 37.4969, 127.0280, "ICN"),
+            // Kyobashi Edogrand, 2-2-1 Kyobashi, Tokyo
+            ("Tokyo", "Asia/Tokyo", 35.6794, 139.7706, "NRT"),
+            // 5th Ave, Taguig, Philippines
             ("Taguig", "Asia/Manila", 14.5507, 121.0455, "MNL"),
-            // 67 Queen St, Melbourne VIC 3000
-            ("Melbourne", "Australia/Melbourne", -37.8170, 144.9600, "MEL")
+            // Level 13, 550 Bourke Street, Melbourne VIC 3000
+            ("Melbourne", "Australia/Melbourne", -37.8173, 144.9584, "MEL")
         ]
 
         let cities = cityData.compactMap { name, identifier, lat, lon, airport -> City? in
