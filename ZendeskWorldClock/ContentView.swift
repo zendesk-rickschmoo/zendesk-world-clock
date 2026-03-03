@@ -11,11 +11,13 @@ enum SortColumn: String, CaseIterable {
 struct ContentView: View {
     @State private var currentTime = Date()
     @State private var showingSettings = false
+    @State private var showingMap = false
     @AppStorage("use12HourFormat") private var use12HourFormat = false
     @AppStorage("sortColumn") private var sortColumn: String = SortColumn.timezone.rawValue
     @AppStorage("sortAscending") private var sortAscending = true
     @State private var hiddenCities: Set<String>
     @ObservedObject private var locationManager = LocationManager.shared
+    @ObservedObject private var weatherManager = WeatherManager.shared
 
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -82,13 +84,19 @@ struct ContentView: View {
                     }
                 }
             }
-            .frame(width: 380, height: 370)
+            .frame(width: 420, height: 370)
         }
         .onReceive(timer) { _ in
             currentTime = Date()
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView(hiddenCities: $hiddenCities)
+        }
+        .sheet(isPresented: $showingMap) {
+            WorldMapView(cities: sortedCities)
+        }
+        .onAppear {
+            weatherManager.fetchWeatherForAllCities()
         }
     }
 
@@ -104,6 +112,16 @@ struct ContentView: View {
             Spacer()
 
             Button(action: {
+                showingMap = true
+            }) {
+                Image(systemName: "map")
+                    .font(.system(size: 14))
+                    .foregroundColor(.secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Show world map")
+
+            Button(action: {
                 showingSettings = true
             }) {
                 Image(systemName: "gear")
@@ -111,6 +129,7 @@ struct ContentView: View {
                     .foregroundColor(.secondary)
             }
             .buttonStyle(.plain)
+            .help("Settings")
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
@@ -130,6 +149,11 @@ struct ContentView: View {
                 .font(.system(size: 10, weight: .medium))
                 .foregroundColor(.secondary)
                 .frame(width: 40, alignment: .leading)
+
+            Text("Weather")
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(.secondary)
+                .frame(width: 50, alignment: .trailing)
 
             Spacer()
 
@@ -212,12 +236,31 @@ struct ContentView: View {
             .help("Open \(city.airportCode) airport in Google Maps")
             .frame(width: 40, alignment: .leading)
 
+            if let weather = weatherManager.weather(for: city.name) {
+                Text("\(weather.conditionSymbol) \(weather.temperatureString)")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+                    .frame(width: 50, alignment: .trailing)
+            } else {
+                Text("—")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+                    .frame(width: 50, alignment: .trailing)
+            }
+
             Spacer()
 
-            Text(formatTime(for: city))
-                .font(.system(size: 13, design: .monospaced))
-                .foregroundColor(.primary)
-                .frame(width: 70, alignment: .trailing)
+            HStack(spacing: 2) {
+                if let dayOffset = dayOffset(for: city), dayOffset != 0 {
+                    Text(dayOffset > 0 ? "+1" : "−1")
+                        .font(.system(size: 9))
+                        .foregroundColor(.secondary)
+                }
+                Text(formatTime(for: city))
+                    .font(.system(size: 13, design: .monospaced))
+                    .foregroundColor(.primary)
+            }
+            .frame(width: 70, alignment: .trailing)
 
             Button(action: {
                 openFlights(to: city)
@@ -281,6 +324,29 @@ struct ContentView: View {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = use12HourFormat ? "h:mm a" : "HH:mm"
         return formatter.string(from: currentTime)
+    }
+
+    private func dayOffset(for city: City) -> Int? {
+        let calendar = Calendar.current
+
+        // Get the day of year in local timezone
+        let localDay = calendar.ordinality(of: .day, in: .year, for: currentTime) ?? 0
+
+        // Get the day of year in the city's timezone
+        var cityCalendar = Calendar.current
+        cityCalendar.timeZone = city.timeZone
+        let cityDay = cityCalendar.ordinality(of: .day, in: .year, for: currentTime) ?? 0
+
+        let diff = cityDay - localDay
+
+        // Handle year boundary (e.g., Dec 31 vs Jan 1)
+        if diff > 300 {
+            return diff - 365
+        } else if diff < -300 {
+            return diff + 365
+        }
+
+        return diff
     }
 
     private func hideCity(_ name: String) {

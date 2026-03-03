@@ -142,6 +142,10 @@ struct City: Identifiable {
         userLocation.distance(from: location)
     }
 
+    func distanceTo(_ otherCity: City) -> CLLocationDistance {
+        location.distance(from: otherCity.location)
+    }
+
     func formattedDistance(from userLocation: CLLocation?) -> String {
         guard let userLocation = userLocation else { return "—" }
         let distanceMeters = distance(from: userLocation)
